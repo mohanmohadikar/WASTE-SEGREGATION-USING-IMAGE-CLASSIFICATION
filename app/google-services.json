@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "132868327490",
+    "firebase_url": "https://wastesegregation-20687.firebaseio.com",
+    "project_id": "wastesegregation-20687",
+    "storage_bucket": "wastesegregation-20687.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:132868327490:android:abbafdc803ec366c",
+        "android_client_info": {
+          "package_name": "com.example.wastesegregation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "132868327490-3vjj24252kkcf3oi2moii561lc12ut3q.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wastesegregation",
+            "certificate_hash": "396bd9079fdd2662cb9f6c2cee9d2d4202fdac9d"
+          }
+        },
+        {
+          "client_id": "132868327490-b607kbd7iub2hh69nup9n02lmjd0lftd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDzUE-qXbYv_Jj-7sZR12UQ5pYcD6zMP6s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "132868327490-b607kbd7iub2hh69nup9n02lmjd0lftd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
