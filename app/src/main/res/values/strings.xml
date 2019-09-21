@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">waste segregation</string>
+    <string name="capture">Capture</string>
 </resources>
