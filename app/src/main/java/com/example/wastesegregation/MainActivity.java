@@ -58,10 +58,13 @@ public class MainActivity extends AppCompatActivity {
 
         //lambdas for button clicks.
         signIn.setOnClickListener(v->{
-            signIn();
-           // Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
+
             Intent intent = new Intent(this, CameraPreview.class);
             startActivity(intent);
+
+           // signIn();
+           // Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
+
         });
 
 
@@ -135,6 +138,8 @@ public class MainActivity extends AppCompatActivity {
 
 
             Toast.makeText(this, "logged in as "+personName, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(this, CameraPreview.class);
+            startActivity(intent);
         }
     }
 }

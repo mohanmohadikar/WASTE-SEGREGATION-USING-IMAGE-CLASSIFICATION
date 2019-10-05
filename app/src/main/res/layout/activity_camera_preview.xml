@@ -9,20 +9,60 @@
 
     <ImageView
         android:id="@+id/imageCapture"
-        android:layout_width="100dp"
-        android:layout_height="100dp" />
-
-    <Button
-        android:id="@+id/btnCapture"
-        android:text="@string/capture"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:src="@drawable/download"
+        android:layout_height="299dp" />
 
-    <Button
-        android:id="@+id/btnSelect"
-        android:text="@string/select"
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/btnCapture"
+                android:text="@string/capture"
+                android:layout_marginRight="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/btnSelect"
+                android:text="@string/select"
+                android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/btnRight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/right" />
+
+        </LinearLayout>
+
+
+
+
+    </LinearLayout>
+
+
 
 
 </LinearLayout>

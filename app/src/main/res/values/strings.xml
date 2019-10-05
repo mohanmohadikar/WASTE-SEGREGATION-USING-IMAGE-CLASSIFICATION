@@ -2,4 +2,6 @@
     <string name="app_name">waste segregation</string>
     <string name="capture">Capture</string>
     <string name="select">select</string>
+    <string name="wrong">wrong</string>
+    <string name="right">right</string>
 </resources>
