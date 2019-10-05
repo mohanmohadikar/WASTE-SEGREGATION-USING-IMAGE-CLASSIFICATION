@@ -162,9 +162,7 @@ public class CameraPreview extends AppCompatActivity {
                     tflite.run(imgData, labelProbArray);
                     System.out.println(labelProbArray[0][0]);
                     System.out.println(labelProbArray[0][1]);
-                   /*System.out.println(labelProbArray[1][0]);
-                    System.out.println(labelProbArray[1][1]);
-                    //System.out.println(labelProbArray.length);*/
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
