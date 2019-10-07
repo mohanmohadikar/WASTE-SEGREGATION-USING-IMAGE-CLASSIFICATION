@@ -26,6 +26,8 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
@@ -69,8 +71,8 @@ public class CameraPreview extends AppCompatActivity {
     //boolean value dictating if chosen model is quantized version or not.
     private boolean quant = false;
 
-    // filename in assets
-    // model in not quantized
+    public String predictLabel = "";
+    public String predictProbablility = "";
 
 
     @Override
@@ -142,68 +144,6 @@ public class CameraPreview extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-
-        if(resultCode == RESULT_OK ){
-            if(requestCode == REQUEST_IMAGE){
-                Uri uri = imageUri;
-                System.out.println(uri);
-                System.out.println("jai hind doston");
-                imageCapture.setImageURI(uri);
-                //Bitmap bitmap = null;
-                try {
-                    Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                    imageCapture.setImageBitmap(bitmap);
-                    bitmap = getResizedBitmap(bitmap, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
-                    convertBitmapToByteBuffer(bitmap);
-                    tflite.run(imgData, labelProbArray);
-                    System.out.println(labelProbArray[0][0]);
-                    System.out.println(labelProbArray[0][1]);
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-
-            }
-            else if(requestCode == REQUEST_IMAGE_GALLERY){
-
-                Uri uri = data.getData();
-                System.out.println(uri);
-                System.out.println("jai hind doston");
-                imageCapture.setImageURI(uri);
-                //Bitmap bitmap = null;
-                try {
-                    Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                    imageCapture.setImageBitmap(bitmap);
-                    bitmap = getResizedBitmap(bitmap, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
-                    convertBitmapToByteBuffer(bitmap);
-                    tflite.run(imgData, labelProbArray);
-                    System.out.println(labelProbArray[0][0]);
-                    System.out.println(labelProbArray[0][1]);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-        }
-
-
-
-        Intent i = new Intent(CameraPreview.this, WasteResult.class);
-        // put image data in extras to send
-        i.putExtra("resID_uri", imageUri);
-        // put filename in extras
-        i.putExtra("chosen", chosen);
-        // put model type in extras
-        i.putExtra("quant", quant);
-        // send other required data
-        startActivity(i);
-    }
 
     private MappedByteBuffer loadModelFile() throws IOException {
         AssetFileDescriptor fileDescriptor = this.getAssets().openFd(chosen);
@@ -264,6 +204,100 @@ public class CameraPreview extends AppCompatActivity {
         Bitmap resizedBitmap = Bitmap.createBitmap(
                 bm, 0, 0, width, height, matrix, false);
         return resizedBitmap;
+    }
+
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        Intent intent = new Intent(this, WasteResult.class);
+
+
+
+        if(resultCode == RESULT_OK ){
+            if(requestCode == REQUEST_IMAGE){
+                Uri uri = imageUri;
+                System.out.println(uri);
+                System.out.println("jai hind doston");
+                imageCapture.setImageURI(uri);
+                //Bitmap bitmap = null;
+                try {
+                    Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    imageCapture.setImageBitmap(bitmap);
+                    bitmap = getResizedBitmap(bitmap, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
+                    convertBitmapToByteBuffer(bitmap);
+                    tflite.run(imgData, labelProbArray);
+
+                    if(labelProbArray[0][0]>labelProbArray[0][1]){
+                        predictLabel = "ORGANIC";
+                        predictProbablility = Double.toString (round(labelProbArray[0][0]*100.00,2));
+                    }
+                    else{
+                        predictLabel = "RECYCLABLE";
+                        predictProbablility = Double.toString (round(labelProbArray[0][1]*100.00,2));
+                    }
+
+
+                    intent.putExtra("predictLabel", predictLabel);
+                    intent.putExtra("predictProbablility", predictProbablility);
+                    startActivity(intent);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+
+            }
+            else if(requestCode == REQUEST_IMAGE_GALLERY){
+
+                Uri uri = data.getData();
+                System.out.println(uri);
+                System.out.println("jai hind doston");
+                imageCapture.setImageURI(uri);
+                //Bitmap bitmap = null;
+                try {
+                    Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    imageCapture.setImageBitmap(bitmap);
+                    bitmap = getResizedBitmap(bitmap, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
+                    convertBitmapToByteBuffer(bitmap);
+                    tflite.run(imgData, labelProbArray);
+                    if(labelProbArray[0][0]>labelProbArray[0][1]){
+                        predictLabel = "ORGANIC";
+                        predictProbablility = Double.toString (round(labelProbArray[0][0]*100.00,2));
+                    }
+                    else{
+                        predictLabel = "RECYCLABLE";
+                        predictProbablility = Double.toString (round(labelProbArray[0][1]*100.00,2));
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+                intent.putExtra("predictLabel", predictLabel);
+                intent.putExtra("predictProbablility", predictProbablility);
+                startActivity(intent);
+
+            }
+
+        }
+
+
+
+
+    }
+
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = new BigDecimal(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 
 }
