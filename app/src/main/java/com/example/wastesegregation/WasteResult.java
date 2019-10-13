@@ -43,7 +43,7 @@ public class WasteResult extends AppCompatActivity {
         TAG = label;
         probability = intent.getStringExtra("predictProbablility");
       //  predictlabel.setText(label);
-        message = "PREDICTION ACCURACY : "+probability;
+        message = "PREDICTION ACCURACY : "+probability+"%";
 
        // predictProbability.setText("PREDICTION ACCURACY : "+probability);
 
