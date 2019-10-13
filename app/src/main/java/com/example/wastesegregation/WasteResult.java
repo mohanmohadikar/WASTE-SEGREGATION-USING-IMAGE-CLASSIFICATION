@@ -10,6 +10,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -27,14 +30,21 @@ public class WasteResult extends AppCompatActivity {
     public String TAG;
     public String message;
 
+    public String url = "https://www.google.com";
+
+    WebView ourBrow;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waste_result);
 
+        ourBrow = (WebView)findViewById(R.id.webview);
+        ourBrow.setWebViewClient(new MyBrowser());
+        ourBrow.getSettings().setJavaScriptEnabled(true);
+        ourBrow.loadUrl(url);
 
-        predictlabel = (TextView)findViewById(R.id.predictLabel);
-        predictProbability = (TextView)findViewById(R.id.predictProbability);
+
 
 
 
@@ -43,7 +53,7 @@ public class WasteResult extends AppCompatActivity {
         TAG = label;
         probability = intent.getStringExtra("predictProbablility");
       //  predictlabel.setText(label);
-        message = "PREDICTION ACCURACY : "+probability;
+        message = "PREDICTION ACCURACY : "+probability+"%";
 
        // predictProbability.setText("PREDICTION ACCURACY : "+probability);
 
@@ -55,5 +65,14 @@ public class WasteResult extends AppCompatActivity {
         alert.showDialog(this, TAG, message);
 
 
+    }
+
+    private class MyBrowser extends WebViewClient{
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            view.loadUrl(url);
+            return true;
+        }
     }
 }
