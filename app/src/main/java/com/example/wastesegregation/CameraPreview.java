@@ -221,7 +221,7 @@ public class CameraPreview extends AppCompatActivity {
             if(requestCode == REQUEST_IMAGE){
                 Uri uri = imageUri;
                 System.out.println(uri);
-                System.out.println("jai hind doston");
+                //System.out.println("jai hind doston");
                 imageCapture.setImageURI(uri);
                 //Bitmap bitmap = null;
                 try {
