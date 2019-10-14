@@ -1,0 +1,283 @@
+
+<!DOCTYPE html>
+<html>
+
+	<style type="text/css">
+		* {
+  	box-sizing: border-box;
+  	font-family: -apple-system, BlinkMacSystemFont, "segoe ui", roboto, oxygen, ubuntu, cantarell, "fira sans", "droid sans", "helvetica neue", Arial, sans-serif;
+  	font-size: 16px;
+  	-webkit-font-smoothing: antialiased;
+  	-moz-osx-font-smoothing: grayscale;
+}
+body {
+  	background-color: #435165;
+  	margin: 0;
+  	padding-left: 7%;
+  	padding-right: 7%;
+}
+.login, .register {
+  	width: 400px;
+  	background-color: #ffffff;
+  	box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
+  	margin: 100px auto;
+}
+.login h1, .register h1 {
+  	text-align: center;
+  	color: #5b6574;
+  	font-size: 24px;
+  	padding: 20px 0 20px 0;
+  	border-bottom: 1px solid #dee0e4;
+}
+.login .links, .register .links {
+  	display: flex;
+  	padding: 0 15px;
+}
+.login .links a, .register .links a {
+  	color: #adb2ba;
+  	text-decoration: none;
+  	display: inline-flex;
+  	padding: 0 10px 10px 10px;
+  	font-weight: bold;
+}
+.login .links a:hover, .register .links a:hover {
+  	color: #9da3ac;
+}
+.login .links a.active, .register .links a.active {
+  	border-bottom: 3px solid #3274d6;
+  	color: #3274d6;
+}
+.login form, .register form {
+  	display: flex;
+  	flex-wrap: wrap;
+  	justify-content: center;
+  	padding-top: 20px;
+}
+.login form label, .register form label {
+  	display: flex;
+  	justify-content: center;
+  	align-items: center;
+  	width: 50px;
+  	height: 50px;
+  	background-color: #3274d6;
+  	color: #ffffff;
+}
+.login form input[type="password"], .login form input[type="text"], .login form input[type="email"], .register form input[type="password"], .register form input[type="text"], .register form input[type="email"] {
+  	width: 310px;
+  	height: 50px;
+  	border: 1px solid #dee0e4;
+  	margin-bottom: 20px;
+  	padding: 0 15px;
+}
+.login form input[type="submit"], .register form input[type="submit"] {
+  	width: 100%;
+  	padding: 15px;
+  	margin-top: 20px;
+  	background-color: #3274d6;
+  	border: 0;
+  	cursor: pointer;
+  	font-weight: bold;
+  	color: #ffffff;
+  	transition: background-color 0.2s;
+}
+.login form input[type="submit"]:hover, .register form input[type="submit"]:hover {
+  	background-color: #2868c7;
+  	transition: background-color 0.2s;
+}
+.navtop {
+  	background-color: #000000;
+  	height: 100px;
+  	width: 100%;
+  	border: 0;
+}
+.navtop div {
+  	display: flex;
+  	margin: 0 auto;
+  	width: 1000px;
+  	height: 100%;
+}
+.navtop div h1, .navtop div a {
+  	display: inline-flex;
+  	align-items: center;
+}
+.navtop div h1 {
+  	flex: 1;
+  	font-size: 24px;
+  	padding: 0;
+ 	margin: 0;
+  	color: #eaebed;
+  	font-weight: normal;
+}
+.navtop div a {
+  	padding: 0 20px;
+  	text-decoration: none;
+  	color: #c1c4c8;
+  	font-weight: bold;
+}
+.navtop div a i {
+  	padding: 2px 8px 0 0;
+}
+.navtop div a:hover {
+  	color: #eaebed;
+}
+body.loggedin {
+  	background-color: #8091FF;
+  	padding-left: 1%;
+  	padding-right: 7%;
+}
+.content {
+  	width: 1000px;
+  	margin: 0 auto;
+  	padding-left: 1%;
+  	padding-right: 7%;
+}
+.content h2 {
+  	margin: 0;
+  	padding: 25px 0;
+  	font-size: 22px;
+  	border-bottom: 1px solid #e0e0e3;
+  	color: #ffffff;
+}
+.content h1 {
+  	margin: 0;
+  	padding: 25px 0;
+  	font-size: 50px;
+  	border-bottom: 1px solid #e0e0e3;
+  	color: #ffffff;
+}
+.content > p, .content > div {
+  	box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
+  	margin: 25px 0;
+  	padding: 25px;
+	background-color: #fff;
+}
+.content > p table td, .content > div table td {
+	padding: 5px;
+}
+.content > p table td:first-child, .content > div table td:first-child {
+	font-weight: bold;
+	color: #000000;
+	padding-right: 15px;
+}
+.content > div p {
+	padding: 5px;
+	margin: 0 0 10px 0;
+}
+	</style>
+     <div class="content">
+		<h1>Recyclable Waste Management</h1></div>
+		<div class="content">
+
+
+<h2>What is Recycling?<strong><br></strong></h2>
+<p>Unless you have been on another planet for the last century, then you have probably heard of it. Recycling is the process of breaking down and re-using materials that would otherwise be thrown away as trash. Many communities and businesses make it easy to recycle by placing labeled containers in the open for public use, or providing bins for home and business owners who have curbside pickup.</p>
+<p>There are numerous benefits to recycling, and with so many new technologies making even more materials recyclable, with everyone’s help we can clean up our Earth. Recycling not only benefits the environment but also have a positive effect on the economy. Recycling is reported throughout human history but has come a long way since the time of Plato when humans re-used broken tools and pottery when materials were scarce. Today, there is a multitude of benefits that come from recycling as well as tons of items that can be recycled.</p><div class="code-block code-block-1" style="margin: 2px 2px 2px 5px; text-align: left; display: block; clear: both;">
+
+
+</div>
+<h2>Why is Recycling Important?</h2>
+<p>The benefits are far reaching and everybody gains when people adopt recycling as an everyday habit. Whether it is a community effort to help beautify a dirty neighborhood street, or on a larger scale to help a business save hundreds to thousands of dollars on waste management, the advantages of well-maintained recycling program are endless.</p>
+<h2>Environmental Benefits</h2><div class="content">
+<ul><li>By recycling people can prevent millions of tons of material from saving space for garbage that cannot be re-purposed. Landfills not only pollute the environment but also hampers the beauty of the city.</li>
+</ul><ul><li>The pollutants that are released into the air and water can be greatly reduced with an increase in recycling.</li>
+</ul><ul><li>Greatly reduces the amount of energy used daily by not needing to produce new materials. In short, recycling reduces the greenhouse gas emissions into the atmosphere.</li>
+</ul><ul><li>If for absolutely nothing else, recycling keeps litter overflow to a minimum keeping the Earth looking beautiful.</li>
+</ul><ul><li>In terms of energy, a single light bulb can be powered for up to four hours with the energy saved from one recycled glass bottle.</li>
+</ul><ul><li>Conserves the Earth’s natural resources like raw materials, minerals, trees, etc.</li></ul></div>
+<h2>Economic Benefits</h2>
+<div class="content">
+<ul><li>Properly run recycling programs cost the government, taxpayers, and business owners less money than waste programs.</li>
+</ul><ul><li>Studies show that by continuing to increase positive recycling habits, the United States can create over one million jobs annually.</li>
+</ul><ul><li>People can even make money by collecting approved materials to a nearby recycling facility that will pay for the product.</li>
+</ul><ul><li>For every one job created in the waste management industry recycling creates four.</li></ul></div>
+</ul><h2>Common Recyclable Items</h2>
+<p>There are so many materials that can be recycled in today’s society, it would take a book to go into detail about each and every one. Listed below, however, are a few of the most common recyclable items people come across in their everyday lives.</p>
+<p><strong>Metal</strong></p>
+<p>Metals that we use in our everyday life are often times recyclable. Being a very versatile material,recycling metal takes more than seventy percent less energy than it does to produce a completely new item.</p>
+<div class="content">
+<ul><li><strong>Aluminum foil</strong> – (As well as bakeware) can easily be recycled. By melting down the foil products and simply repurposing the metal aluminum can be recycled almost infinitely.</li>
+</ul><ul><li><strong>Aluminum cans</strong> – Studies show that Americans drink at least one canned beverage per day while only recycling a little over forty-five percent. It would save immense amounts of energy to recycle and reuse them as opposed to making new ones.</li>
+</ul><ul><li><strong>Steel and tin cans</strong> – Things like coffee cans, soup containers, vegetable cans, etc. are one of the most recycled materials in America. This is a comforting statistic considering on average about 100 million are used daily in the States.</li></ul></div>
+<h2>Paper and Cardboard</h2>
+<p>Most people can look around themselves at just about any point in the day and see paper or paper products. Paper is a material that has no limits in the recycling world, and American are doing a great job recycling. Studies show that people are recycling about 334 pounds of paper annually. Paper and cardboard materials that can be recycled are:</p>
+
+<div class="content">
+<ul><li><strong>Corrugated cardboard</strong> – This makes up most of the cardboard in people’s everyday lives. Over seventy percent of shipping boxes already having been repurposed from sawdust, woodchips, or other paper products. Other items recycled cardboard is used to make are things like cereal boxes, tissue paper, printing paper, and poster board.</li>
+</ul><ul><li><strong>Magazines and newspaper</strong> – Many people still get magazines and newspapers on their mailboxes and on their front porches. Too frequently these are junk ads or unwanted publications that go directly into the trash. One ton of recycled paper can save enough energy to power an American household for over five months.</li>
+</ul><ul><li><strong>Office paper and poster board</strong> – Most people interact with at least one piece of paper a day. Papers are in the mailbox, printer, briefcase next to the door, everywhere. Paper can be easily repurposed saving high production cost and energy levels for new products.</li></ul></div>
+
+<h2>Glass</h2>
+<p>Glass bottles and jars are not quite as versatile as paper or metal products when it comes to recycling. Due to the various colors of glass, many items can only be repurposed into another of the same item. The different types of glass recycling typically pertain to the color of the bottle or jar.</p>
+<div class="content">
+<ul><li><strong>Flint glass</strong> – This is the term used to refer to clear glass items which make up the largest part of the glass market at just over sixty percent. Usually, items bottled in clear glass containers is not light sensitive and people want to have seen.</li>
+</ul><ul><li><strong>Amber glass</strong> – One of the reasons glass can be hard to recycle is due to the fact that the colors cannot be removed. For instance amber, or brown, glass makes up less of the glass market than flint at thirty-one percent partially because it can only be made into other amber colored glass products when recycled. Generally, items that are sensitive to sunlight are stored in brown colored glass bottles and jars.</li>
+</ul><ul><li><strong>Emerald glass</strong> – When one thinks emerald, or green, glass wine and beer bottles typically come to mind. This is because the items inside are sensitive to sunlight and temperature, however not quite as sensitive as products that need to be stored in brown glass containers.</li></ul></div>
+</ul><p>Practicing good recycling habits is not difficult, nor is there a secret to being a “good recycler.” There are lots of ways to help create and maintain a better community through recycling.</p>
+<h2>Ways To Help in Recycling</h2>
+<div class="content">
+<ul><li>Get involved with local recycling programs.</li>
+</ul><ul><li>Volunteer to educate a class at a local elementary school. Kids can be huge advocates for the war on trash easily holding everyone around them accountable for the things they throw in the garbage.</li>
+</ul><ul><li>Take some time to go around and pick up trash in your own neighborhood or surround ones.</li>
+</ul><ul><li>If your job does not have a receptacle for recyclable products, ask if they wouldn’t mind providing one, or if they mind you providing one yourself.</li>
+</ul><ul><li>Make sure to practice proper recycling habits in your own life, nothing works better than leading by example.</li>
+
+<li>Recycle all bottles, cans and paper.</li>
+<li>Keep items clean and dry.</li>
+<li>No plastic bags in the recycling.</li></ul></div>
+
+
+<h2>Acceptable Recycling Materials</h2>
+<div class="content">
+<ul>
+<li>Aluminum cans, foil and trays</li>
+<li>Tin cans and bi-metal cans</li>
+<li>Rinsed milk cartons - flattened</li>
+<li>Juice boxes and soy milk boxes - flattened</li>
+<li>Carryout bags, butter and margarine tubs, screw on caps and yogurt containers</li>
+<li>Plastic bags</li>
+<li>Mixed plastic materials</li>
+<li>Shampoo, detergent, milk, soda, water, etc.</li>
+<li>All plastic food containers marked #1 through #7.</li>
+<li>Glass bottles and jars - empty and rinsed</li>
+<li>Loose newspaper</li>
+<li>Paper board</li>
+<li>Cereal and cracker boxes</li>
+<li>Six-pack cartons</li>
+<li>Cardboard and corrugated boxes</li>
+<li>Brown grocery bags</li>
+<li>Magazines</li>
+<li>Glossy paper</li>
+<li>Junk mail</li>
+<li>Stationery and envelopes</li>
+<li>Any high grade/uncoated paper</li>
+<li>Binder/notebook paper, any color</li>
+</ul></div>
+<h2>Non-Acceptable Recycling Materials</h2>
+<div class="content">
+<ul>
+<li>Scrap metal</li>
+<li>Plastic motor oil bottles</li>
+<li>Window pane glass</li>
+<li>Mirror</li>
+<li>Light bulbs</li>
+<li>Ceramic pottery, cups, and dishes</li>
+<li>Ovenware</li>
+<li>Plastic or wax coated paper</li>
+<li>Cereal box liners</li>
+<li>Books</li>
+<li>Gummed or glued bindings (telephone books ok)</li>
+<li>Paper towels, napkins, tissue paper, paper plates, soiled paper, adhesive backed or sticky paper</li>
+<li>Carbon paper</li>
+<li>Aluminum foil boxes</li>
+<li>Plastic wrap</li>
+</ul></div>
+<h2>How to Prepare Your Recycling</h2>
+<div class="content">
+<ul>
+<li>Rinse and flatten cans, milk cartons and jugs to save space and energy</li>
+<li>Metal jar lids can be placed with your tin cans</li>
+<li>No need to remove labels</li>
+<li>Plastic bags are only recyclable if they have the recycling symbol. They can be included with the rest of your recyclables.</li>
+<li>To bag your plastic bags, place all your grocery store plastic bags, dry cleaning plastic bags, or any other plastic bags in a plastic bag. Residents should then place the full plastic bag filled with plastic bags in the recycling bin.</li>
+</ul></article></div>
+</html>

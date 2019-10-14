@@ -139,11 +139,7 @@ public class WasteResult extends AppCompatActivity {
             return true;
         }
 
-        if (id == R.id.logout) {
 
-            signOut();
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -155,22 +151,11 @@ public class WasteResult extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
+           // Intent intent = new Intent(WasteResult.this, MainActivity.class);
+          //  startActivity(intent);
         }
     }
 
 
-    private void signOut() {
-        // Firebase sign out
-        mAuth.signOut();
 
-        // Google sign out
-        mGoogleSignInClient.signOut().addOnCompleteListener(this,
-                new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        Intent intent = new Intent(WasteResult.this, MainActivity.class);
-                        startActivity(intent);
-                    }
-                });
-    }
 }

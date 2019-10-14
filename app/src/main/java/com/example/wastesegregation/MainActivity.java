@@ -43,6 +43,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (isLoggedin())
+        {
+            updateUI(mAuth.getCurrentUser());
+        }
+
         for(int x = 0;x<1;x++){
 
             // request permission to use the camera on the user's phone
@@ -99,6 +104,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private boolean isLoggedin() {
+
+        if(mAuth.getCurrentUser()==null) return false;
+        return true;
     }
 
 
