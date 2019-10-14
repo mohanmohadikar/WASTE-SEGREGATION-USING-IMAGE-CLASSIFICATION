@@ -1,6 +1,8 @@
 package com.example.wastesegregation;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.app.AlertDialog;
 import android.app.Notification;
@@ -10,11 +12,20 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class WasteResult extends AppCompatActivity {
 
@@ -29,8 +40,17 @@ public class WasteResult extends AppCompatActivity {
 
     public String TAG;
     public String message;
+    public String url1;
+    public String url2;
 
-    public String url = "https://www.google.com";
+    public String urlo = "file:///android_asset/organic.html";
+    public String urlr = "file:///android_asset/recycle.html";
+
+
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+
+
 
     WebView ourBrow;
 
@@ -39,23 +59,41 @@ public class WasteResult extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waste_result);
 
-        ourBrow = (WebView)findViewById(R.id.webview);
-        ourBrow.setWebViewClient(new MyBrowser());
-        ourBrow.getSettings().setJavaScriptEnabled(true);
-        ourBrow.loadUrl(url);
-
-
-
+        mAuth = FirebaseAuth.getInstance();
 
 
         Intent intent = getIntent();
         label = intent.getStringExtra("predictLabel");
         TAG = label;
         probability = intent.getStringExtra("predictProbablility");
-      //  predictlabel.setText(label);
+        //  predictlabel.setText(label);
         message = "PREDICTION ACCURACY : "+probability+"%";
 
-       // predictProbability.setText("PREDICTION ACCURACY : "+probability);
+        // predictProbability.setText("PREDICTION ACCURACY : "+probability);
+
+        if(label == "organic"){
+            url1 = urlo;
+            url2 = urlr;
+        }
+        else{
+            url1 = urlr;
+            url2 = urlo;
+        }
+
+        ourBrow = (WebView)findViewById(R.id.webview);
+        ourBrow.setWebViewClient(new MyBrowser());
+        ourBrow.getSettings().setJavaScriptEnabled(true);
+        ourBrow.loadUrl(url1);
+
+
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+
+
+
+
 
 
 
@@ -67,6 +105,50 @@ public class WasteResult extends AppCompatActivity {
 
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.example_menu, menu);
+        return true;
+    }
+
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+
+        if (id == R.id.get_more_info) {
+
+            Intent intent = new Intent(this, GetMoreInfo.class);
+            intent.putExtra("url2",url2);
+            startActivity(intent);
+            return true;
+        }
+
+        if (id == R.id.feedback) {
+            Intent intent = new Intent(this, Feedback.class);
+            startActivity(intent);
+            return true;
+        }
+
+        if (id == R.id.logout) {
+
+            signOut();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
     private class MyBrowser extends WebViewClient{
 
         @Override
@@ -74,5 +156,21 @@ public class WasteResult extends AppCompatActivity {
             view.loadUrl(url);
             return true;
         }
+    }
+
+
+    private void signOut() {
+        // Firebase sign out
+        mAuth.signOut();
+
+        // Google sign out
+        mGoogleSignInClient.signOut().addOnCompleteListener(this,
+                new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Intent intent = new Intent(WasteResult.this, MainActivity.class);
+                        startActivity(intent);
+                    }
+                });
     }
 }

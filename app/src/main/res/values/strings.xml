@@ -4,4 +4,5 @@
     <string name="select">select</string>
     <string name="wrong">wrong</string>
     <string name="right">right</string>
+    <string name="history">history</string>
 </resources>

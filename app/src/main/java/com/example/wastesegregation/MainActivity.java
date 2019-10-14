@@ -2,9 +2,14 @@ package com.example.wastesegregation;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -23,6 +28,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
+import static com.example.wastesegregation.CameraPreview.REQUEST_PERMISSION;
+
 public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
@@ -35,6 +42,30 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        for(int x = 0;x<1;x++){
+
+            // request permission to use the camera on the user's phone
+            if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+            }
+
+            // request permission to write data (aka images) to the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
+            }
+
+            // request permission to read data (aka images) from the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
+            }
+
+
+        }
 
 
         signIn = (SignInButton)findViewById(R.id.sign_in_button);
@@ -59,11 +90,11 @@ public class MainActivity extends AppCompatActivity {
         //lambdas for button clicks.
         signIn.setOnClickListener(v->{
 
-            Intent intent = new Intent(this, CameraPreview.class);
-            startActivity(intent);
+           // Intent intent = new Intent(this, CameraPreview.class);
+           // startActivity(intent);
 
-           // signIn();
-           // Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
+            signIn();
+            Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
 
         });
 
@@ -138,7 +169,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             Toast.makeText(this, "logged in as "+personName, Toast.LENGTH_LONG).show();
+
+            String pe = acct.getFamilyName()+acct.getGivenName();
+
             Intent intent = new Intent(this, CameraPreview.class);
+
+            intent.putExtra("KEY",pe);
+
             startActivity(intent);
         }
     }

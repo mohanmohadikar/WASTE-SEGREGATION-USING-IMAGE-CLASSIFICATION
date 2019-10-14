@@ -1,28 +1,50 @@
 package com.example.wastesegregation;
 
 import android.Manifest;
+import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import org.tensorflow.lite.Interpreter;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -32,7 +54,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class CameraPreview extends AppCompatActivity {
@@ -55,6 +79,7 @@ public class CameraPreview extends AppCompatActivity {
     private float[][] labelProbArray = null;
     private Button btnCapture;
     private Button btnSelect;
+    private Button btnHistory;
     public ImageView imageCapture;
     private static final int REQUEST_IMAGE_GALLERY = 2;
     public static final int REQUEST_PERMISSION = 300;
@@ -75,11 +100,38 @@ public class CameraPreview extends AppCompatActivity {
     public String predictProbablility = "";
 
 
+    private StorageReference mStorageRef;
+    private DatabaseReference mDatabaseRef;
+    String storageNode;
+
+    public String filename = "log.txt";
+
+    ProgressBar mProgressbar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_preview);
+
+
+
+
+
+
+        Intent i = getIntent();
+        storageNode = i.getStringExtra("KEY");
+
+
+        mStorageRef = FirebaseStorage.getInstance().getReference(storageNode);
+        mDatabaseRef = FirebaseDatabase.getInstance().getReference(storageNode);
+
+
+        //uploadFile();
+
+
+
 
         try{
             tflite = new Interpreter(loadModelFile(), tfliteOptions);
@@ -91,42 +143,114 @@ public class CameraPreview extends AppCompatActivity {
         imgData.order(ByteOrder.nativeOrder());
         labelProbArray = new float[1][labelList.size()];
 
-        // request permission to use the camera on the user's phone
-        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+
+        for(int x = 0;x<1;x++){
+
+            // request permission to use the camera on the user's phone
+            if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+            }
+
+            // request permission to write data (aka images) to the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
+            }
+
+            // request permission to read data (aka images) from the user's external storage of their phone
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                    && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION);
+            }
+
+
         }
 
-        // request permission to write data (aka images) to the user's external storage of their phone
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSION);
-        }
-
-        // request permission to read data (aka images) from the user's external storage of their phone
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_PERMISSION);
-        }
 
 
         imageCapture = (ImageView)findViewById(R.id.imageCapture);
         btnCapture = (Button)findViewById(R.id.btnCapture);
         btnSelect = (Button)findViewById(R.id.btnSelect);
 
+
         btnCapture.setOnClickListener(v->{
+
+            for(int x = 0;x<1;x++){
+
+                // request permission to use the camera on the user's phone
+                if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+                }
+
+                // request permission to write data (aka images) to the user's external storage of their phone
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION);
+                }
+
+                // request permission to read data (aka images) from the user's external storage of their phone
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION);
+                }
+
+
+            }
+
+
             openCameraIntent();
 
 
         });
 
         btnSelect.setOnClickListener(v->{
+
+            for(int x = 0;x<1;x++){
+
+                // request permission to use the camera on the user's phone
+                if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+                    ActivityCompat.requestPermissions(this, new String[] {android.Manifest.permission.CAMERA}, REQUEST_PERMISSION);
+                }
+
+                // request permission to write data (aka images) to the user's external storage of their phone
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION);
+                }
+
+                // request permission to read data (aka images) from the user's external storage of their phone
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+                        && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            REQUEST_PERMISSION);
+                }
+
+
+            }
+
+
             Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
             galleryIntent.setType("image/*");
             startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
         });
+
+
     }
+
+
+
+    private String getFileExtension(Uri uri){
+        ContentResolver cr = getContentResolver();
+        MimeTypeMap mime = MimeTypeMap.getSingleton();
+        return mime.getExtensionFromMimeType(cr.getType(uri));
+    }
+
+
 
     // opens camera for user
     private void openCameraIntent(){
@@ -224,6 +348,8 @@ public class CameraPreview extends AppCompatActivity {
                 //System.out.println("jai hind doston");
                 imageCapture.setImageURI(uri);
                 //Bitmap bitmap = null;
+
+
                 try {
                     Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                     imageCapture.setImageBitmap(bitmap);
@@ -249,6 +375,7 @@ public class CameraPreview extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
+                uploadFile(imageUri);
 
 
             }
@@ -258,7 +385,7 @@ public class CameraPreview extends AppCompatActivity {
                 System.out.println(uri);
                 System.out.println("jai hind doston");
                 imageCapture.setImageURI(uri);
-                //Bitmap bitmap = null;
+
                 try {
                     Bitmap bitmap = (Bitmap) MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                     imageCapture.setImageBitmap(bitmap);
@@ -278,13 +405,19 @@ public class CameraPreview extends AppCompatActivity {
                 }
 
 
+
+
                 intent.putExtra("predictLabel", predictLabel);
                 intent.putExtra("predictProbablility", predictProbablility);
                 startActivity(intent);
 
+                uploadFile(data.getData());
+
             }
 
         }
+
+
 
 
 
@@ -300,4 +433,50 @@ public class CameraPreview extends AppCompatActivity {
         return bd.doubleValue();
     }
 
+
+    private void uploadFile(Uri uri){
+
+
+        //String storageNode = "abc";
+
+
+        Uri file = uri;
+        Bitmap bitmap = null;
+        try {
+            bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+        //Uri file = Uri.fromFile(new File("storage/emulated/0/Notes/log.txt"));
+        StorageReference ref = mStorageRef.child(storageNode+"/" + predictLabel.charAt(0)+ Calendar.getInstance().getTimeInMillis() +".jpeg");
+        System.out.println(predictLabel);
+
+
+
+        ref.putFile(getImageUri(this,getResizedBitmap(bitmap,480,480)))
+                .addOnSuccessListener(taskSnapshot ->
+                        Toast.makeText(this, "file uploaded", Toast.LENGTH_LONG).show())
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle unsuccessful uploads
+                        // ...
+
+                        Toast.makeText(CameraPreview.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
+    }
+
+
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
 }
