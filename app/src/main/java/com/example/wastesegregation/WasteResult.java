@@ -33,8 +33,7 @@ public class WasteResult extends AppCompatActivity {
     private Notification.Action.Builder data;
 
 
-    public TextView predictlabel;
-    public TextView predictProbability;
+
     public String label;
     public String probability;
 
@@ -47,19 +46,12 @@ public class WasteResult extends AppCompatActivity {
     public String urlr = "file:///android_asset/recycle.html";
 
 
-    private FirebaseAuth mAuth;
-    private GoogleSignInClient mGoogleSignInClient;
-
-
-
     WebView ourBrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_waste_result);
-
-        mAuth = FirebaseAuth.getInstance();
 
 
         Intent intent = getIntent();
@@ -69,15 +61,15 @@ public class WasteResult extends AppCompatActivity {
         //  predictlabel.setText(label);
         message = "PREDICTION ACCURACY : "+probability+"%";
 
-        // predictProbability.setText("PREDICTION ACCURACY : "+probability);
 
-        if(label == "organic"){
-            url1 = urlo;
-            url2 = urlr;
+
+        if(label.equals("RECYCLABLE")){
+            url2 = urlo;
+            url1 = urlr;
         }
         else{
-            url1 = urlr;
-            url2 = urlo;
+            url2 = urlr;
+            url1 = urlo;
         }
 
         ourBrow = (WebView)findViewById(R.id.webview);
@@ -88,15 +80,6 @@ public class WasteResult extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-
-
-
-
-
-
-
-
 
 
         ViewDialog alert = new ViewDialog();
@@ -151,8 +134,6 @@ public class WasteResult extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
-           // Intent intent = new Intent(WasteResult.this, MainActivity.class);
-          //  startActivity(intent);
         }
     }
 

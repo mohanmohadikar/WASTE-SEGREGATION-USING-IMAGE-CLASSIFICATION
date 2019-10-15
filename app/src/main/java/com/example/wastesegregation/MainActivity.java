@@ -43,10 +43,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (isLoggedin())
-        {
-            updateUI(mAuth.getCurrentUser());
-        }
 
         for(int x = 0;x<1;x++){
 
@@ -95,22 +91,15 @@ public class MainActivity extends AppCompatActivity {
         //lambdas for button clicks.
         signIn.setOnClickListener(v->{
 
-           // Intent intent = new Intent(this, CameraPreview.class);
-           // startActivity(intent);
 
             signIn();
-            Toast.makeText(this, "login success", Toast.LENGTH_SHORT).show();
+
 
         });
 
 
     }
 
-    private boolean isLoggedin() {
-
-        if(mAuth.getCurrentUser()==null) return false;
-        return true;
-    }
 
 
     private void signIn() {

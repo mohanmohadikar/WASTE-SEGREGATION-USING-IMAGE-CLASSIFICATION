@@ -20,6 +20,7 @@ public class Feedback extends AppCompatActivity {
 
 
         ourBrow = (WebView)findViewById(R.id.webview);
+        ourBrow.getSettings().setUserAgentString("WasteSegregation");
         ourBrow.setWebViewClient(new MyBrowser());
         ourBrow.getSettings().setJavaScriptEnabled(true);
         ourBrow.loadUrl(url);

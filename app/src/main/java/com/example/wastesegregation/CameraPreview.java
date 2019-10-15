@@ -1,7 +1,6 @@
 package com.example.wastesegregation;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -9,42 +8,31 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.MediaStore;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import org.tensorflow.lite.Interpreter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -54,7 +42,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -77,8 +64,8 @@ public class CameraPreview extends AppCompatActivity {
     // holds the selected image data as bytes
     private ByteBuffer imgData = null;
     private float[][] labelProbArray = null;
-    private Button btnCapture;
-    private Button btnSelect;
+    private ImageView btnCapture;
+    private ImageView btnSelect;
     private Button btnHistory;
     public ImageView imageCapture;
     private static final int REQUEST_IMAGE_GALLERY = 2;
@@ -93,8 +80,7 @@ public class CameraPreview extends AppCompatActivity {
     // string to send to next activity that describes the chosen classifier
     private String chosen="colab_model.tflite";
 
-    //boolean value dictating if chosen model is quantized version or not.
-    private boolean quant = false;
+
 
     public String predictLabel = "";
     public String predictProbablility = "";
@@ -104,10 +90,6 @@ public class CameraPreview extends AppCompatActivity {
     private DatabaseReference mDatabaseRef;
     String storageNode;
 
-    public String filename = "log.txt";
-
-    ProgressBar mProgressbar;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,19 +98,11 @@ public class CameraPreview extends AppCompatActivity {
         setContentView(R.layout.activity_camera_preview);
 
 
-
-
-
-
         Intent i = getIntent();
         storageNode = i.getStringExtra("KEY");
 
-
         mStorageRef = FirebaseStorage.getInstance().getReference(storageNode);
         mDatabaseRef = FirebaseDatabase.getInstance().getReference(storageNode);
-
-
-        //uploadFile();
 
 
 
@@ -171,8 +145,8 @@ public class CameraPreview extends AppCompatActivity {
 
 
         imageCapture = (ImageView)findViewById(R.id.imageCapture);
-        btnCapture = (Button)findViewById(R.id.btnCapture);
-        btnSelect = (Button)findViewById(R.id.btnSelect);
+        btnCapture = (ImageView) findViewById(R.id.btnCapture);
+        btnSelect = (ImageView) findViewById(R.id.btnSelect);
 
 
         btnCapture.setOnClickListener(v->{
@@ -200,8 +174,6 @@ public class CameraPreview extends AppCompatActivity {
 
 
             }
-
-
             openCameraIntent();
 
 
@@ -244,13 +216,6 @@ public class CameraPreview extends AppCompatActivity {
 
 
 
-    private String getFileExtension(Uri uri){
-        ContentResolver cr = getContentResolver();
-        MimeTypeMap mime = MimeTypeMap.getSingleton();
-        return mime.getExtensionFromMimeType(cr.getType(uri));
-    }
-
-
 
     // opens camera for user
     private void openCameraIntent(){
@@ -291,16 +256,11 @@ public class CameraPreview extends AppCompatActivity {
                 final int val = intValues[pixel++];
                 // get rgb values from intValues where each int holds the rgb values for a pixel.
                 // if quantized, convert each rgb value to a byte, otherwise to a float
-                if (quant) {
-                    imgData.put((byte) ((val >> 16) & 0xFF));
-                    imgData.put((byte) ((val >> 8) & 0xFF));
-                    imgData.put((byte) (val & 0xFF));
-                } else {
+                if (true) {
                     imgData.putFloat((((val >> 16) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                     imgData.putFloat((((val >> 8) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                     imgData.putFloat((((val) & 0xFF) - IMAGE_MEAN) / IMAGE_STD);
                 }
-
             }
         }
     }
@@ -345,9 +305,7 @@ public class CameraPreview extends AppCompatActivity {
             if(requestCode == REQUEST_IMAGE){
                 Uri uri = imageUri;
                 System.out.println(uri);
-                //System.out.println("jai hind doston");
                 imageCapture.setImageURI(uri);
-                //Bitmap bitmap = null;
 
 
                 try {
@@ -382,8 +340,6 @@ public class CameraPreview extends AppCompatActivity {
             else if(requestCode == REQUEST_IMAGE_GALLERY){
 
                 Uri uri = data.getData();
-                System.out.println(uri);
-                System.out.println("jai hind doston");
                 imageCapture.setImageURI(uri);
 
                 try {
@@ -405,8 +361,6 @@ public class CameraPreview extends AppCompatActivity {
                 }
 
 
-
-
                 intent.putExtra("predictLabel", predictLabel);
                 intent.putExtra("predictProbablility", predictProbablility);
                 startActivity(intent);
@@ -416,10 +370,6 @@ public class CameraPreview extends AppCompatActivity {
             }
 
         }
-
-
-
-
 
 
     }
@@ -437,9 +387,6 @@ public class CameraPreview extends AppCompatActivity {
     private void uploadFile(Uri uri){
 
 
-        //String storageNode = "abc";
-
-
         Uri file = uri;
         Bitmap bitmap = null;
         try {
@@ -451,7 +398,6 @@ public class CameraPreview extends AppCompatActivity {
 
 
 
-        //Uri file = Uri.fromFile(new File("storage/emulated/0/Notes/log.txt"));
         StorageReference ref = mStorageRef.child(storageNode+"/" + predictLabel.charAt(0)+ Calendar.getInstance().getTimeInMillis() +".jpeg");
         System.out.println(predictLabel);
 
@@ -459,12 +405,10 @@ public class CameraPreview extends AppCompatActivity {
 
         ref.putFile(getImageUri(this,getResizedBitmap(bitmap,480,480)))
                 .addOnSuccessListener(taskSnapshot ->
-                        Toast.makeText(this, "file uploaded", Toast.LENGTH_LONG).show())
+                        Toast.makeText(this, "Your file is uploaded for further analysis", Toast.LENGTH_LONG).show())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
-                        // Handle unsuccessful uploads
-                        // ...
 
                         Toast.makeText(CameraPreview.this, exception.getMessage(), Toast.LENGTH_LONG).show();
                     }

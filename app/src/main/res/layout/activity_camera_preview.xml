@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:orientation="vertical"
     tools:context=".CameraPreview">
 
     <ImageView
         android:id="@+id/imageCapture"
         android:layout_width="match_parent"
-        android:src="@drawable/download"
-        android:layout_height="299dp" />
+        android:src="@mipmap/preview"
+        android:layout_height="600dp" />
 
 
     <LinearLayout
@@ -25,19 +26,22 @@
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"
             android:orientation="horizontal">
-            <Button
-                android:id="@+id/btnCapture"
-                android:text="@string/capture"
-                android:layout_marginRight="20dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
 
-            <Button
+            <ImageView
+                android:id="@+id/btnCapture"
+                android:layout_width="148dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="1dp"
+                android:src="@mipmap/camera"
+                android:text="@string/capture" />
+
+            <ImageView
                 android:id="@+id/btnSelect"
-                android:text="@string/select"
-                android:layout_marginLeft="20dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="1dp"
+                android:src="@mipmap/files"
+                android:text="@string/select" />
 
 
 
