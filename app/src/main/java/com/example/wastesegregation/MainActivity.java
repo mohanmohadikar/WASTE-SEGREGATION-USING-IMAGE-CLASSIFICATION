@@ -28,7 +28,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 
-import static com.example.wastesegregation.CameraPreview.REQUEST_PERMISSION;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private SignInButton signIn;
     private int RC_SIGN_IN = 1;
     private String TAG = "nothing...";
+    public static final int REQUEST_PERMISSION = 300;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 
             String pe = acct.getFamilyName()+acct.getGivenName();
 
-            Intent intent = new Intent(this, CameraPreview.class);
+            Intent intent = new Intent(this, TakeImage.class);
 
             intent.putExtra("KEY",pe);
 

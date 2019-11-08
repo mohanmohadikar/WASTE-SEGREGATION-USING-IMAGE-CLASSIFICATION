@@ -14,12 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".Feedback"></activity>
+        <activity android:name=".PictureActivity"></activity>
+        <activity android:name=".TakeImage" />
+        <activity android:name=".Feedback" />
         <activity android:name=".GetMoreInfo" />
         <activity android:name=".Classify" />
         <activity android:name=".ChooseModel" />
         <activity android:name=".WasteResult" />
-        <activity android:name=".CameraPreview" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
