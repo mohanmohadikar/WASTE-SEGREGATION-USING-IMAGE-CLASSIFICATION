@@ -4,7 +4,10 @@
 
     <item
         android:id="@+id/get_more_info"
-        android:title="Get more info"/>
+        android:title="Organic Waste"/>
+    <item
+        android:id="@+id/recyclable"
+        android:title="Recyclable Waste"/>
     <item
         android:id="@+id/feedback"
         android:title="Feedback"/>

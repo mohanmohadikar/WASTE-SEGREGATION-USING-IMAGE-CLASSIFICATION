@@ -14,7 +14,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".PictureActivity"></activity>
         <activity android:name=".TakeImage" />
         <activity android:name=".Feedback" />
         <activity android:name=".GetMoreInfo" />

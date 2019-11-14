@@ -35,6 +35,19 @@
         android:textColor="#8A8A8A"
         android:textSize="18sp" />
 
+
+    <ImageView
+        android:id="@+id/imagepredict"
+        android:layout_gravity="center"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"/>
+
+
+
     <TextView
         android:id="@+id/gotIt"
         android:layout_width="match_parent"

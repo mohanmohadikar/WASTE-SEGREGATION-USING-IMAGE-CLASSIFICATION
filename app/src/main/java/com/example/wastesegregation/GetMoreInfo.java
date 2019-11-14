@@ -18,7 +18,7 @@ public class GetMoreInfo extends AppCompatActivity {
         setContentView(R.layout.activity_get_more_info);
 
         Intent i = getIntent();
-        url = i.getStringExtra("url2");
+        url = i.getStringExtra("urlo");
 
 
 
