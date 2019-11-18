@@ -12,3 +12,18 @@ public class About extends AppCompatActivity {
         setContentView(R.layout.activity_about);
     }
 }
+
+
+/*
+flashOn.setOnClickListener(v->{
+        turnOnFlashLight();
+        flashOn.setVisibility(v.INVISIBLE);
+        flashOff.setVisibility(v.VISIBLE);
+        });
+        flashOff.setOnClickListener(v->{
+        turnOffFlashLight();
+        flashOff.setVisibility(v.INVISIBLE);
+        flashOn.setVisibility(v.VISIBLE);
+
+        });
+*/

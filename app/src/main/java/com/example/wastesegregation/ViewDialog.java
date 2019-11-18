@@ -17,6 +17,9 @@ import java.io.IOException;
 
 public class ViewDialog {
 
+
+
+
     public void showDialog(Activity activity, String TAG, String message, Uri uri){
         final Dialog dialog = new Dialog(activity);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -33,7 +36,6 @@ public class ViewDialog {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         TextView label = (TextView) dialog.findViewById(R.id.label);
         label.setText(TAG);

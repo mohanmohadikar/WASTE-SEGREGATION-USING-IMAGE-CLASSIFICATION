@@ -35,6 +35,17 @@ public class MainActivity extends AppCompatActivity {
     // and returned in the Activity's onRequestPermissionsResult()
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {
+
+
+
+            android.Manifest.permission.READ_CONTACTS,
+            android.Manifest.permission.WRITE_CONTACTS,
+
+
+
+
+
+
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA,
