@@ -145,8 +145,30 @@
             <ImageView
                 android:layout_width="22dp"
                 android:layout_height="22dp"
-                android:id="@+id/fon"
+                android:id="@+id/flashOn"
                 android:src="@drawable/flashon"
+                android:layout_marginLeft="0dp"
+                android:layout_marginBottom="25dp"
+                android:textSize="15sp"
+                android:text="Select"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:gravity="bottom|center"
+            android:layout_marginRight="30dp"
+            android:layout_toLeftOf="@id/camlin"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:visibility="invisible"
+                android:id="@+id/flashOff"
+                android:src="@drawable/flashoff"
                 android:layout_marginLeft="0dp"
                 android:layout_marginBottom="25dp"
                 android:textSize="15sp"

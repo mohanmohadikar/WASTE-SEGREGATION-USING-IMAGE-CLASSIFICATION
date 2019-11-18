@@ -1,11 +1,5 @@
 package com.example.wastesegregation;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,14 +18,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -57,6 +59,14 @@ import java.util.Calendar;
 import java.util.List;
 
 public class TakeImage extends AppCompatActivity {
+
+
+    private static final String FeedbackFormUrl = "https://docs.google.com/forms/d/e/1FAIpQLSfQHJ6Q1U2dqB6YJNdd_nIkFxjN2CBfYcAuiakDvV4R1YFwGA/viewform?usp=sf_link";
+    private static final String BiodegradableWaste = "https://www.wikihow.com/Recycle-Biodegradable-Waste";
+    private static final String RecycableWaste = "https://en.wikipedia.org/wiki/Recycling";
+
+
+    View v;
 
 
     String[] prediction = new String[2];
@@ -128,7 +138,7 @@ public class TakeImage extends AppCompatActivity {
     private Camera mCamera;
     private ImagePreview mPreview;
     private Camera.PictureCallback mPicture;
-    private ImageView capture, switchCamera, selGal;
+    private ImageView capture, switchCamera, selGal, flashOn, flashOff;
     private Context myContext;
     private LinearLayout cameraPreview;
     private boolean cameraFront = false;
@@ -136,6 +146,7 @@ public class TakeImage extends AppCompatActivity {
     private static final int REQUEST_IMAGE_GALLERY = 2;
    // String storageNode;
     public static String userAccount;
+    private GoogleSignInClient mGoogleSignInClient;
 
     Bitmap b2;
 
@@ -145,30 +156,43 @@ public class TakeImage extends AppCompatActivity {
         setContentView(R.layout.activity_take_image);
 
 
+        cameraPreview = (LinearLayout) findViewById(R.id.cPreview);
+        capture = (ImageView) findViewById(R.id.btnCam);
+        switchCamera = (ImageView) findViewById(R.id.btnSwitch);
+        flashOn = (ImageView) findViewById(R.id.flashOn);
+        flashOff = (ImageView) findViewById(R.id.flashOff);
+        menudots = (ImageView) findViewById(R.id.menudots);
+        selGal = (ImageView) findViewById(R.id.selGal);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        myContext = this;
+
+        mCamera =  Camera.open();
+        mCamera.setDisplayOrientation(0);
+
+        mPreview = new ImagePreview(myContext, mCamera);
+        cameraPreview.addView(mPreview);
 
 
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-//        toolbar.inflateMenu(R.menu.example_menu);
         setSupportActionBar(toolbar);
-
-
-        intw = new Intent(TakeImage.this, WasteResult.class);
-        //intw.putExtra("predictLabel", prediction[0]);
-
-
 
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
         }
 
-//
+
+        //sign out purpose.
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
-
-
-        matrix.postRotate(90);
-
+        //initiating the TFLite interpreter.
         try{
             tflite = new Interpreter(loadModelFile(), tfliteOptions);
             labelList = loadLabelList();
@@ -180,8 +204,6 @@ public class TakeImage extends AppCompatActivity {
         labelProbArray = new float[1][labelList.size()];
 
 
-
-
         Intent i = getIntent();
         storageNode = i.getStringExtra("KEY");
         userAccount = storageNode;
@@ -190,21 +212,7 @@ public class TakeImage extends AppCompatActivity {
         mDatabaseRef = FirebaseDatabase.getInstance().getReference(storageNode);
 
 
-        //ViewDialog alert = new ViewDialog();
-       // alert.showDialog(this, TAG, message);
-
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        myContext = this;
-
-        mCamera =  Camera.open();
-        mCamera.setDisplayOrientation(90);
-        cameraPreview = (LinearLayout) findViewById(R.id.cPreview);
-        capture = (ImageView) findViewById(R.id.btnCam);
-        switchCamera = (ImageView) findViewById(R.id.btnSwitch);
-        menudots = (ImageView) findViewById(R.id.menudots);
-        selGal = (ImageView) findViewById(R.id.selGal);
-        mPreview = new ImagePreview(myContext, mCamera);
-        cameraPreview.addView(mPreview);
+        matrix.setRotate(90);
 
         CameraSwitch();
         CameraSwitch();
@@ -226,161 +234,77 @@ public class TakeImage extends AppCompatActivity {
             startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
         });
 
+        flashOn.setOnClickListener(v->{
+            turnOnFlashLight();
+            flashOn.setVisibility(v.INVISIBLE);
+            flashOff.setVisibility(v.VISIBLE);
+        });
+        flashOff.setOnClickListener(v->{
+            turnOffFlashLight();
+            flashOff.setVisibility(v.INVISIBLE);
+            flashOn.setVisibility(v.VISIBLE);
+
+        });
 
 
         mCamera.startPreview();
 
     }
 
-
-
-
-
-
-
-
-    private int findFrontFacingCamera() {
-
-        int cameraId = -1;
-        // Search for the front facing camera
-        int numberOfCameras = Camera.getNumberOfCameras();
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-                cameraId = i;
-                cameraFront = true;
-                break;
-            }
-        }
-        return cameraId;
-
-    }
-
-    private int findBackFacingCamera() {
-        int cameraId = -1;
-        //Search for the back facing camera
-        //get the number of cameras
-        int numberOfCameras = Camera.getNumberOfCameras();
-        //for every camera check
-        for (int i = 0; i < numberOfCameras; i++) {
-            Camera.CameraInfo info = new Camera.CameraInfo();
-            Camera.getCameraInfo(i, info);
-            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                cameraId = i;
-                cameraFront = false;
-                break;
-
-            }
-
-        }
-        return cameraId;
-    }
-
-    private void CameraSwitch() {
-        //get the number of cameras
-        int camerasNumber = Camera.getNumberOfCameras();
-        if (camerasNumber > 1) {
-            //release the old camera instance
-            //switch camera, from the front and the back and vice versa
-
-            releaseCamera();
-            chooseCamera();
-        } else {
-
-        }
-    }
-
-    public void onResume() {
-
-        super.onResume();
-        if(mCamera == null) {
-            mCamera = Camera.open();
-            mCamera.setDisplayOrientation(90);
-            mPicture = getPictureCallback();
-            mPreview.refreshCamera(mCamera);
-            Log.d("nu", "null");
-        }else {
-            Log.d("nu","no null");
-        }
-
-    }
-
-    public void chooseCamera() {
-        //if the camera preview is the front
-        if (cameraFront) {
-            int cameraId = findBackFacingCamera();
-            if (cameraId >= 0) {
-                //open the backFacingCamera
-                //set a picture callback
-                //refresh the preview
-
-                mCamera = Camera.open(cameraId);
-                mCamera.setDisplayOrientation(90);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        } else {
-            int cameraId = findFrontFacingCamera();
-            if (cameraId >= 0) {
-                //open the backFacingCamera
-                //set a picture callback
-                //refresh the preview
-                mCamera = Camera.open(cameraId);
-                mCamera.setDisplayOrientation(90);
-                mPicture = getPictureCallback();
-                mPreview.refreshCamera(mCamera);
-            }
-        }
-    }
+    
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        //when on Pause, release camera in order to be used from other applications
-        releaseCamera();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.example_menu, menu);
+        return true;
     }
 
-    private void releaseCamera() {
-        // stop and release camera
-        if (mCamera != null) {
-            mCamera.stopPreview();
-            mCamera.setPreviewCallback(null);
-            mCamera.release();
-            mCamera = null;
+
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+
+        if (id == R.id.get_more_info) {
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(RecycableWaste));
+            startActivity(browserIntent);
+            return true;
         }
+
+        if (id == R.id.recyclable) {
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(BiodegradableWaste));
+            startActivity(browserIntent);
+            return true;
+        }
+
+        if (id == R.id.feedback) {
+
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(FeedbackFormUrl));
+            startActivity(browserIntent);
+            return true;
+        }
+
+        if (id == R.id.sign_out) {
+            signOut();
+            return true;
+        }
+
+
+
+        return super.onOptionsItemSelected(item);
     }
 
-    private Camera.PictureCallback getPictureCallback() {
-        Camera.PictureCallback picture = new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] data, Camera camera) {
-                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
-
-                Uri uri = getImageUri(TakeImage.this, bitmap);
 
 
-                b5 = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-//                imageView.setImageBitmap(b3);
-                b5 = getResizedBitmap(b5, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
-                saveImage(b5);
-                b4 = b5;
-                prediction = predict(uri);
-
-                ViewDialog alert = new ViewDialog();
-                alert.showDialog(TakeImage.this, prediction[0], prediction[1], uri);
-                //releaseCamera();
-                mCamera.startPreview();
-               // mCamera = Camera.open();
-              //  CameraSwitch();
-              //  CameraSwitch();
-               // Intent intent = new Intent(TakeImage.this,PictureActivity.class);
-               // startActivity(intent);
-            }
-        };
-        return picture;
-    }
 
 
 
@@ -410,13 +334,6 @@ public class TakeImage extends AppCompatActivity {
 
                 ViewDialog alert = new ViewDialog();
                 alert.showDialog(this, prediction[0], prediction[1], uri);
-
-
-
-                //Intent intent = new Intent(this, PictureActivity.class);
-               // intent.putExtra("uri", uri);
-               // intent.putExtra("KEY", storageNode);
-                //startActivity(intent);
             }
         }
     }
@@ -457,16 +374,6 @@ public class TakeImage extends AppCompatActivity {
         uploadFile(ImgUri);
 
         return result;
-
-
-
-
-       // Intent predictIntent = new Intent(this, WasteResult.class);
-      //  predictIntent.putExtra("predictLabel", predictLabel);
-      //  predictIntent.putExtra("predictProbablility", predictProbablility);
-     //   predictIntent.putExtra("uri", uri);
-       // startActivity(predictIntent);
-
     }
 
 
@@ -492,7 +399,7 @@ public class TakeImage extends AppCompatActivity {
 
         ref.putFile(getImageUri(this,getResizedBitmap(bitmap,480,480)))
                 .addOnSuccessListener(taskSnapshot ->
-                        Toast.makeText(this, "Your file is uploaded for further analysis", Toast.LENGTH_LONG).show())
+                        Toast.makeText(this, "This image has been uploaded for further analysis", Toast.LENGTH_LONG).show())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
@@ -611,60 +518,197 @@ public class TakeImage extends AppCompatActivity {
     }
 
 
-    public   void goToSuggestion(Intent inten){
-      //  Intent intent = new Intent(TakeImage.this, WasteResult.class);
 
-        startActivity(inten);
+
+
+
+
+
+    public void turnOnFlashLight() {
+        try {
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+               // Camera cam = Camera.open();
+                Camera.Parameters p = mCamera.getParameters();
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+               // p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(p);
+              //  cam.startPreview();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "Exception throws in turning on flashlight.", Toast.LENGTH_SHORT).show();
+        }
     }
 
+
+    public void turnOffFlashLight() {
+        try {
+            if (getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+                // Camera cam = Camera.open();
+                Camera.Parameters p = mCamera.getParameters();
+                p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                // p.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                mCamera.setParameters(p);
+                //  cam.startPreview();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(getBaseContext(), "Exception throws in turning on flashlight.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private void signOut() {
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        // ...
+                        updateUI();
+                    }
+                });
+    }
+
+    private void updateUI() {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
+
+
+    private int findFrontFacingCamera() {
+
+        int cameraId = -1;
+        // Search for the front facing camera
+        int numberOfCameras = Camera.getNumberOfCameras();
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+                cameraId = i;
+                cameraFront = true;
+                break;
+            }
+        }
+        return cameraId;
+
+    }
+
+    private int findBackFacingCamera() {
+        int cameraId = -1;
+        //Search for the back facing camera
+        //get the number of cameras
+        int numberOfCameras = Camera.getNumberOfCameras();
+        //for every camera check
+        for (int i = 0; i < numberOfCameras; i++) {
+            Camera.CameraInfo info = new Camera.CameraInfo();
+            Camera.getCameraInfo(i, info);
+            if (info.facing == Camera.CameraInfo.CAMERA_FACING_BACK) {
+                cameraId = i;
+                cameraFront = false;
+                break;
+
+            }
+
+        }
+        return cameraId;
+    }
+
+    private void CameraSwitch() {
+        //get the number of cameras
+        int camerasNumber = Camera.getNumberOfCameras();
+        if (camerasNumber > 1) {
+            //release the old camera instance
+            //switch camera, from the front and the back and vice versa
+
+            releaseCamera();
+            chooseCamera();
+        } else {
+
+        }
+
+        flashOff.setVisibility(v.INVISIBLE);
+        flashOn.setVisibility(v.VISIBLE);
+    }
+
+    public void onResume() {
+
+        super.onResume();
+        if(mCamera == null) {
+            mCamera = Camera.open();
+            mCamera.setDisplayOrientation(90);
+            mPicture = getPictureCallback();
+            mPreview.refreshCamera(mCamera);
+            Log.d("nu", "null");
+        }else {
+            Log.d("nu","no null");
+        }
+
+    }
+
+    public void chooseCamera() {
+        //if the camera preview is the front
+        if (cameraFront) {
+            int cameraId = findBackFacingCamera();
+            if (cameraId >= 0) {
+                //open the backFacingCamera
+                //set a picture callback
+                //refresh the preview
+
+                mCamera = Camera.open(cameraId);
+                mCamera.setDisplayOrientation(90);
+                mPicture = getPictureCallback();
+                mPreview.refreshCamera(mCamera);
+            }
+        } else {
+            int cameraId = findFrontFacingCamera();
+            if (cameraId >= 0) {
+                //open the backFacingCamera
+                //set a picture callback
+                //refresh the preview
+                mCamera = Camera.open(cameraId);
+                mCamera.setDisplayOrientation(90);
+                mPicture = getPictureCallback();
+                mPreview.refreshCamera(mCamera);
+            }
+        }
+    }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.example_menu, menu);
-        return true;
+    protected void onPause() {
+        super.onPause();
+        //when on Pause, release camera in order to be used from other applications
+        releaseCamera();
     }
 
-
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-
-        if (id == R.id.get_more_info) {
-
-            Intent intent = new Intent(this, GetMoreInfo.class);
-            intent.putExtra("urlo",urlo);
-            startActivity(intent);
-            return true;
+    private void releaseCamera() {
+        // stop and release camera
+        if (mCamera != null) {
+            mCamera.stopPreview();
+            mCamera.setPreviewCallback(null);
+            mCamera.release();
+            mCamera = null;
         }
-
-        if (id == R.id.recyclable) {
-
-            Intent intent = new Intent(this, WasteResult.class);
-            intent.putExtra("urlr",urlr);
-            startActivity(intent);
-            return true;
-        }
-
-        if (id == R.id.feedback) {
-            Intent intent = new Intent(this, Feedback.class);
-            startActivity(intent);
-            return true;
-        }
-
-
-
-        return super.onOptionsItemSelected(item);
     }
 
+    private Camera.PictureCallback getPictureCallback() {
+        Camera.PictureCallback picture = new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
+                bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
 
+                Uri uri = getImageUri(TakeImage.this, bitmap);
 
+                b5 = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                b5 = getResizedBitmap(b5, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
+                saveImage(b5);
+                b4 = b5;
+                prediction = predict(uri);
 
+                ViewDialog alert = new ViewDialog();
+                alert.showDialog(TakeImage.this, prediction[0], prediction[1], uri);
+                mCamera.startPreview();
+            }
+        };
+        return picture;
+    }
 }

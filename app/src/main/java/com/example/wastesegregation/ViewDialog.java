@@ -22,6 +22,7 @@ public class ViewDialog {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(false);
         dialog.setContentView(R.layout.custom);
+        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
 
 
 
