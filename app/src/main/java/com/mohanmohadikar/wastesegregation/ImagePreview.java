@@ -1,4 +1,4 @@
-package com.example.wastesegregation;
+package com.mohanmohadikar.wastesegregation;
 
 import android.content.Context;
 import android.hardware.Camera;

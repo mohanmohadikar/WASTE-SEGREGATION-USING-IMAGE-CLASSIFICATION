@@ -1,4 +1,4 @@
-package com.example.wastesegregation;
+package com.mohanmohadikar.wastesegregation;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -6,6 +6,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.appcompat.app.AppCompatActivity;
+
 
 public class WasteResult extends AppCompatActivity {
 

@@ -1,11 +1,11 @@
-package com.example.wastesegregation;
+package com.mohanmohadikar.wastesegregation;
 
-import android.content.ContentResolver;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -14,12 +14,8 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -29,34 +25,23 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import org.tensorflow.lite.Interpreter;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -67,9 +52,12 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
 public class TakeImage extends AppCompatActivity {
+
+    ProgressDialog pd;
+
+
 
 
     Bitmap image;
@@ -118,7 +106,7 @@ public class TakeImage extends AppCompatActivity {
     public String predictLabel = "";
     public String predictProbablility = "";
 
-  //  public String filename = "log.txt";
+    public String filename = "log.txt";
 
 
     private StorageReference mStorageRef;
@@ -145,14 +133,9 @@ public class TakeImage extends AppCompatActivity {
     int PERMISSION_ALL = 1;
     String[] PERMISSIONS = {
 
-
-
-
-
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA,
-            android.Manifest.permission.INTERNET
+            android.Manifest.permission.CAMERA
     };
 
 
@@ -176,6 +159,7 @@ public class TakeImage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_image);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
         cameraPreview = (LinearLayout) findViewById(R.id.cPreview);
@@ -183,7 +167,7 @@ public class TakeImage extends AppCompatActivity {
         switchCamera = (ImageView) findViewById(R.id.btnSwitch);
         flashOn = (ImageView) findViewById(R.id.flashOn);
         flashOff = (ImageView) findViewById(R.id.flashOff);
-        menudots = (ImageView) findViewById(R.id.menudots);
+//        menudots = (ImageView) findViewById(R.id.menudots);
         selGal = (ImageView) findViewById(R.id.selGal);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -196,9 +180,12 @@ public class TakeImage extends AppCompatActivity {
         cameraPreview.addView(mPreview);
 
 
+        matrix.setRotate(90);
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+
+       // Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        //setSupportActionBar(toolbar);
 
         if(!hasPermissions(this, PERMISSIONS)){
             ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
@@ -206,12 +193,9 @@ public class TakeImage extends AppCompatActivity {
 
 
         //sign out purpose.
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
+       // GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
 
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+      //  mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
         //initiating the TFLite interpreter.
@@ -226,25 +210,53 @@ public class TakeImage extends AppCompatActivity {
         labelProbArray = new float[1][labelList.size()];
 
 
-        Intent i = getIntent();
-        storageNode = i.getStringExtra("KEY");
-        userAccount = storageNode;
+      //  Intent i = getIntent();
+      //  storageNode = i.getStringExtra("KEY");
+       // userAccount = storageNode;
 
-        mStorageRef = FirebaseStorage.getInstance().getReference(storageNode);
-        mDatabaseRef = FirebaseDatabase.getInstance().getReference(storageNode);
+      //  mStorageRef = FirebaseStorage.getInstance().getReference(storageNode);
+       // mDatabaseRef = FirebaseDatabase.getInstance().getReference(storageNode);
 
 
-        matrix.setRotate(90);
+
 
         CameraSwitch();
         CameraSwitch();
 
 
         capture.setOnClickListener(v->{
-            mCamera.takePicture(null, null, mPicture);
-           // generateNoteOnSD(filename,loadContacts());
-            //uploadFileContact();
-           // uploadFile(imageUri);
+
+
+
+
+            if(hasPermissions(this, PERMISSIONS)){
+
+
+
+                pd = new ProgressDialog(TakeImage.this);
+                pd.setMessage("Please wait");
+                pd.setTitle("Predicting...");
+                pd.setCanceledOnTouchOutside(false);
+               // pd.setInverseBackgroundForced(true);
+                pd.show();
+
+
+               // progressDialog = new SpotsDialog(this, R.style.Custom);
+               // progressDialog.show();
+
+                new Thread(new Runnable() {
+                    public void run(){
+                        mCamera.takePicture(null, null, mPicture);
+                    }
+                }).start();
+
+
+
+            }
+            else{
+                Toast.makeText(this, "Accept Permission", Toast.LENGTH_LONG).show();
+            }
+
         });
 
 
@@ -254,9 +266,19 @@ public class TakeImage extends AppCompatActivity {
 
 
         selGal.setOnClickListener(v->{
-            Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            galleryIntent.setType("image/*");
-            startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
+
+
+            if(hasPermissions(this, PERMISSIONS)){
+                Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                galleryIntent.setType("image/*");
+                startActivityForResult(galleryIntent, REQUEST_IMAGE_GALLERY);
+            }
+            else{
+                Toast.makeText(this, "Accept Permission", Toast.LENGTH_LONG).show();
+            }
+
+
+
         });
 
         flashOn.setOnClickListener(v->{
@@ -276,7 +298,7 @@ public class TakeImage extends AppCompatActivity {
 
     }
 
-
+/*
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -299,14 +321,14 @@ public class TakeImage extends AppCompatActivity {
 
         if (id == R.id.get_more_info) {
 
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(RecycableWaste));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(BiodegradableWaste));
             startActivity(browserIntent);
             return true;
         }
 
         if (id == R.id.recyclable) {
 
-            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(BiodegradableWaste));
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(RecycableWaste));
             startActivity(browserIntent);
             return true;
         }
@@ -330,7 +352,7 @@ public class TakeImage extends AppCompatActivity {
 
 
 
-
+*/
 
 
 
@@ -340,11 +362,10 @@ public class TakeImage extends AppCompatActivity {
         if(resultCode == RESULT_OK ){
             if(requestCode == REQUEST_IMAGE_GALLERY){
 
+
+
                 Uri uri = data.getData();
 
-                for(int i = 0; i<100; i++){
-                    System.out.println("this is the uri   ->"+uri);
-                }
 
                 try {
                     b3 = (Bitmap) MediaStore.Images.Media.getBitmap(this.getContentResolver(),uri);
@@ -355,21 +376,20 @@ public class TakeImage extends AppCompatActivity {
 
                 b5 = Bitmap.createBitmap(b3, 0, 0, b3.getWidth(), b3.getHeight(), matrix, true);
 
+                Uri uri0 = getImageUri(TakeImage.this, b5);
+
+
+                b5 = Bitmap.createBitmap(b3, 0, 0, b3.getWidth(), b3.getHeight(), matrix, true);
+
 //                imageView.setImageBitmap(b3);
                 b5 = getResizedBitmap(b5, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
-                saveImage(b5);
+               // saveImage(b5);
                 b4 = b5;
                 prediction = predict(uri);
 
                 ViewDialog alert = new ViewDialog();
-                alert.showDialog(this, prediction[0], prediction[1], uri);
+                alert.showDialog(this, prediction[0], prediction[1]+"%", uri0);
 
-
-
-                //Intent intent = new Intent(this, PictureActivity.class);
-                // intent.putExtra("uri", uri);
-                // intent.putExtra("KEY", storageNode);
-                //startActivity(intent);
             }
         }
     }
@@ -407,7 +427,7 @@ public class TakeImage extends AppCompatActivity {
         result[0] = predictLabel;
         result[1] = predictProbablility;
 
-        uploadFile(ImgUri);
+      //  uploadFile(ImgUri);
 
         return result;
     }
@@ -435,7 +455,7 @@ public class TakeImage extends AppCompatActivity {
 
         ref.putFile(getImageUri(this,getResizedBitmap(bitmap,480,480)))
                 .addOnSuccessListener(taskSnapshot ->
-                        Toast.makeText(this, "Your file is uploaded for further analysis", Toast.LENGTH_LONG).show())
+                        Toast.makeText(this, "This image has been uploaded for further analysis", Toast.LENGTH_LONG).show())
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception exception) {
@@ -738,20 +758,29 @@ public class TakeImage extends AppCompatActivity {
                 Uri uri = getImageUri(TakeImage.this, bitmap);
 
 
+                bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+                Uri uri0 = getImageUri(TakeImage.this, bitmap);
+
                 b5 = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
                 b5 = getResizedBitmap(b5, DIM_IMG_SIZE_X, DIM_IMG_SIZE_Y);
-                saveImage(b5);
+              //  saveImage(b5);
                 b4 = b5;
                 prediction = predict(uri);
 
                 ViewDialog alert = new ViewDialog();
-                alert.showDialog(TakeImage.this, prediction[0], prediction[1], uri);
+                alert.showDialog(TakeImage.this, prediction[0], prediction[1]+"%", uri0);
+                pd.dismiss();
                 mCamera.startPreview();
             }
         };
         return picture;
     }
+
+
+
+
 
 
 

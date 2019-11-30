@@ -1,7 +1,8 @@
-package com.example.wastesegregation;
+package com.mohanmohadikar.wastesegregation;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,13 +11,12 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-            android.Manifest.permission.READ_CONTACTS,
-            android.Manifest.permission.WRITE_CONTACTS,
+           // android.Manifest.permission.READ_CONTACTS,
+           // android.Manifest.permission.WRITE_CONTACTS,
+
 
 
 
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
             android.Manifest.permission.CAMERA,
-            android.Manifest.permission.INTERNET
+           // android.Manifest.permission.INTERNET
 
     };
 
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private SignInButton signIn;
+    private AppCompatButton signIn;
     private int RC_SIGN_IN = 1;
     private String TAG = "nothing...";
     public static final int REQUEST_PERMISSION = 300;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
         if(!hasPermissions(this, PERMISSIONS)){
@@ -76,32 +78,29 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-        acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
+       // acct = GoogleSignIn.getLastSignedInAccount(getApplicationContext());
 
 
 
-        signIn = (SignInButton)findViewById(R.id.sign_in_button);
+        signIn = (AppCompatButton) findViewById(R.id.sign_in_button);
 
         // Initialize Firebase Auth
-        mAuth = FirebaseAuth.getInstance();
+       // mAuth = FirebaseAuth.getInstance();
 
 
         // Configure sign-in to request the user's ID, email address, and basic
         // profile. ID and basic profile are included in DEFAULT_SIGN_IN.
         // Configure Google Sign In
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.default_web_client_id))
-                .requestEmail()
-                .build();
+       // GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestIdToken(getString(R.string.default_web_client_id)).requestEmail().build();
 
 
         // Build a GoogleSignInClient with the options specified by gso.
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+      //  mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
-        if(mAuth.getCurrentUser()!=null){
+       // if(mAuth.getCurrentUser()!=null){
             //FirebaseUser user = mAuth.getCurrentUser();
-            updateUI(mAuth.getCurrentUser());
-        }
+        //    updateUI(mAuth.getCurrentUser());
+        //}
 
 
 
@@ -109,7 +108,15 @@ public class MainActivity extends AppCompatActivity {
         signIn.setOnClickListener(v->{
 
 
-            signIn();
+            if(hasPermissions(this, PERMISSIONS)){
+                signIn();
+            }
+            else{
+                Toast.makeText(this, "Allow permission", Toast.LENGTH_LONG).show();
+                ActivityCompat.requestPermissions(this, PERMISSIONS, PERMISSION_ALL);
+            }
+
+
 
 
         });
@@ -120,8 +127,11 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void signIn() {
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        //Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        //startActivityForResult(signInIntent, RC_SIGN_IN);
+        Intent intent = new Intent(MainActivity.this, TakeImage.class);
+        startActivity(intent);
+        finish();
     }
 
 

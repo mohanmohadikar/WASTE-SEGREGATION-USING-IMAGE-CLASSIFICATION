@@ -5,10 +5,10 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.1"
     defaultConfig {
-        applicationId "com.example.wastesegregation"
+        applicationId "com.mohanmohadikar.wastesegregation"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
+        versionCode 3
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -51,7 +51,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:16.0.4'
     implementation 'com.google.firebase:firebase-database:16.0.4'
     implementation 'com.github.bumptech.glide:glide:4.10.0'
-
+    implementation 'com.github.d-max:spots-dialog:0.4@aar'
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
     implementation 'com.sothree.slidinguppanel:library:3.4.0'
     implementation 'com.google.android.material:material:1.0.0-beta01'
 

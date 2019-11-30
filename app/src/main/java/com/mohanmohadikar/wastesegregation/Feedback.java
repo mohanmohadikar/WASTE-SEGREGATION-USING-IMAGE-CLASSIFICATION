@@ -1,4 +1,4 @@
-package com.example.wastesegregation;
+package com.mohanmohadikar.wastesegregation;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
