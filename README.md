@@ -19,6 +19,10 @@ The future scope of the can be implemented using IoT also.
 ## Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+```bash
+git clone https://github.com/mohanmohadikar/WASTE-SEGREGATION-USING-IMAGE-CLASSIFICATION.git
+```
+
 Please make sure to update tests as appropriate.
 
 ## License
